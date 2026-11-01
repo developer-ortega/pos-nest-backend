@@ -6,7 +6,7 @@ import { GetProductQueryDto } from './dto/get-product.dto.js';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
@@ -17,7 +17,9 @@ export class ProductsController {
   findAll(@Query() query: GetProductQueryDto) {
 
     const category = query.category_Id ? Number(query.category_Id) : null;
-    return this.productsService.findAll(category);
+    const take = query.take ? query.take : 10;
+    const skip = query.skip ? query.skip : 0;
+    return this.productsService.findAll(category, take, skip);
   }
 
   @Get(':id')
