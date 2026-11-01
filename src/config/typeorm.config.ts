@@ -12,7 +12,7 @@ export const typeOrmConfig = (configservice : ConfigService): TypeOrmModuleOptio
     ssl: true,
     logging: true,
     entities: [
-        join(__dirname + '../../**/*.entity.{js,ts}')
+        join(import.meta.dirname, '../**/*.entity.{js,ts}')
     ],
     synchronize: true
 })
