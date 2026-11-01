@@ -19,6 +19,11 @@ export class ProductsService {
       errors.push(`La categoría con ID ${createProductDto.categoryId} no existe.`)
       throw new NotFoundException(errors)
     }
+
+    return this.productRepository.save({
+      ...createProductDto,
+      category
+    })
   }
 
   findAll() {
