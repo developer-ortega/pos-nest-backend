@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { CategoriesService } from './categories.service.js';
 import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
+import { IdValidationPipe } from '../common/pipes/id-validation/id-validation.pipe.js';
 
 @Controller('categories')
 export class CategoriesController {
@@ -18,17 +19,17 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new IdValidationPipe()) id: string) {
     return this.categoriesService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+  update(@Param('id', new IdValidationPipe()) id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoriesService.update(+id, updateCategoryDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', new IdValidationPipe()) id: string) {
     return this.categoriesService.remove(+id);
   }
 }
