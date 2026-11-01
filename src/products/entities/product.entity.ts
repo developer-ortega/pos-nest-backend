@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, type Relation } from "typeorm";
+import { Category } from "../../categories/entities/category.entity.js";
 
 @Entity()
 export class Product {
@@ -16,4 +17,7 @@ export class Product {
 
     @Column({ type: "int" })
     inventory: number;
+
+    @ManyToOne(() => Category, (category) => category.products)
+    category: Relation<Category>;
 }
