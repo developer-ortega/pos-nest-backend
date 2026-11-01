@@ -6,7 +6,7 @@ import { IdValidationPipe } from '../common/pipes/id-validation/id-validation.pi
 
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(private readonly categoriesService: CategoriesService) { }
 
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
@@ -24,7 +24,10 @@ export class CategoriesController {
   }
 
   @Patch(':id')
-  update(@Param('id', new IdValidationPipe()) id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
+  update(
+    @Param('id', new IdValidationPipe()) id: string,
+    @Body() updateCategoryDto: UpdateCategoryDto
+  ) {
     return this.categoriesService.update(+id, updateCategoryDto);
   }
 

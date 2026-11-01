@@ -27,8 +27,15 @@ export class CategoriesService {
     return category;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async update(id: number, updateCategoryDto: UpdateCategoryDto) {
+    const category = await this.categoryRepository.preload({
+      id,
+      ...updateCategoryDto
+    });
+    if (!category) {
+      throw new NotFoundException(`La categoria con el id ${id} no existe`);
+    }
+    return category;
   }
 
   remove(id: number) {
