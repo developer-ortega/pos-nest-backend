@@ -28,7 +28,7 @@ export class ProductsService {
 
   async findAll(categoryId: number | null, take: number, skip: number) {
 
-    const options : FindManyOptions<Product> = {
+    const options: FindManyOptions<Product> = {
       relations: {
         category: true
       },
@@ -47,7 +47,7 @@ export class ProductsService {
       }
     }
 
-    const [ products, total ] = await this.productRepository.findAndCount(options);
+    const [products, total] = await this.productRepository.findAndCount(options);
 
     return {
       products,
@@ -75,10 +75,10 @@ export class ProductsService {
   async update(id: number, updateProductDto: UpdateProductDto) {
     const product = await this.findOne(id);
     Object.assign(product, updateProductDto);
-    if(updateProductDto.categoryId) {
+    if (updateProductDto.categoryId) {
       const category = await this.categoryRepository.findOneBy({ id: updateProductDto.categoryId });
 
-      if(!category){
+      if (!category) {
         let errors: string[] = [];
         errors.push(`La categoría con ID ${updateProductDto.categoryId} no existe.`)
         throw new NotFoundException(errors)
@@ -88,7 +88,9 @@ export class ProductsService {
     return await this.productRepository.save(product);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number) {
+    const product = await this.findOne(id);
+    await this.productRepository.remove(product);
+    return "Producto eliminado correctamente";
   }
 }
