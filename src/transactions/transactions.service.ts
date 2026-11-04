@@ -157,7 +157,27 @@ export class TransactionsService {
     });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
+  async remove(id: number) {
+    return this.transactionRepository.manager.transaction(async (manager) => {
+      const transaction = await manager.findOneBy(Transaction, { id });
+
+      if (!transaction) {
+        throw new NotFoundException(`La transacción con el id ${id} no fue encontrada.`);
+      }
+
+      const contents = await manager.find(TransactionContents, {
+        where: { transaction: { id } },
+        relations: { product: true }
+      });
+
+      for (const content of contents) {
+        await manager.increment(Product, { id: content.product.id }, 'inventory', content.quantity);
+      }
+
+      await manager.delete(TransactionContents, { transaction: { id } });
+      await manager.remove(transaction);
+
+      return { message: 'Venta eliminada' };
+    });
   }
 }
