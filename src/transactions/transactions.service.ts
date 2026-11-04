@@ -20,18 +20,22 @@ export class TransactionsService {
     await this.productRepository.manager.transaction(async (manager) => {
 
       const transaction = new Transaction();
-      transaction.total = createTransactionDto.total;
+      transaction.total = createTransactionDto.contents.reduce((total, item) => total + (item.quantity * item.price), 0)
 
       for (const contents of createTransactionDto.contents) {
 
         const product = await manager.findOneBy(Product, { id: contents.productId });
 
+        const errors = [];
+
         if (!product) {
-          throw new NotFoundException(`El producto con el ID ${contents.productId} no existe.`);
+          errors.push(`El producto con el ID ${contents.productId} no existe.`)
+          throw new NotFoundException(errors);
         }
 
         if (contents.quantity > product.inventory) {
-          throw new BadRequestException(`El articulo ${product.name} no tiene suficiente inventario.`)
+          errors.push(`El articulo ${product.name} no tiene suficiente inventario.`)
+          throw new BadRequestException(errors);
         }
 
         product.inventory -= contents.quantity;
