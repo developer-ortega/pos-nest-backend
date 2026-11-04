@@ -16,33 +16,40 @@ export class TransactionsService {
   ) { }
 
   async create(createTransactionDto: CreateTransactionDto) {
-    const transaction = new Transaction();
-    transaction.total = createTransactionDto.total;
-    await this.transactionRepository.save(transaction);
 
-    for (const contents of createTransactionDto.contents) {
+    await this.productRepository.manager.transaction(async (manager) => {
 
-      const product = await this.productRepository.findOneBy({ id: contents.productId });
+      const transaction = new Transaction();
+      transaction.total = createTransactionDto.total;
 
-      if (!product) {
-        throw new NotFoundException(`El producto con el ID ${contents.productId} no existe.`);
+      for (const contents of createTransactionDto.contents) {
+
+        const product = await manager.findOneBy(Product, { id: contents.productId });
+
+        if (!product) {
+          throw new NotFoundException(`El producto con el ID ${contents.productId} no existe.`);
+        }
+
+        if (contents.quantity > product.inventory) {
+          throw new BadRequestException(`El articulo ${product.name} no tiene suficiente inventario.`)
+        }
+
+        product.inventory -= contents.quantity;
+
+        const transactionContent = new TransactionContents();
+        transactionContent.price = contents.price;
+        transactionContent.product = product;
+        transactionContent.quantity = contents.quantity;
+        transactionContent.transaction = transaction;
+
+        await manager.save(transaction);
+        await manager.save(transactionContent);
       }
 
-      if (contents.quantity > product.inventory) {
-        throw new BadRequestException(`El articulo ${product.name} no tiene suficiente inventario.`)
-      }
-
-      product.inventory -= contents.quantity;
-
-
-      await this.transactionContentsRepository.save({
-        ...contents,
-        transaction,
-        product
-      })
+      return `Venta Almacenada Correctamente`;
     }
-
-    return "Venta creada correctamente";
+    
+    )
   }
 
   findAll() {
