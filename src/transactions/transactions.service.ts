@@ -80,12 +80,81 @@ export class TransactionsService {
     return this.transactionRepository.find(options);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transaction`;
+  async findOne(id: number) {
+
+    const transaction = await this.transactionRepository.findOne({
+      where: {
+        id
+      },
+      relations: {
+        contents: true
+      }
+    })
+
+    if(!transaction){
+      throw new NotFoundException(`La transacción con el id ${id} no fue encontrada.`)
+    }
+
+    return transaction;
   }
 
-  update(id: number, updateTransactionDto: UpdateTransactionDto) {
-    return `This action updates a #${id} transaction`;
+  async update(id: number, updateTransactionDto: UpdateTransactionDto) {
+    const { contents } = updateTransactionDto;
+
+    if (!contents) {
+      throw new BadRequestException(['Los Contenidos son obligatorios para actualizar la venta.']);
+    }
+
+    return this.transactionRepository.manager.transaction(async (manager) => {
+
+      const transaction = await manager.findOneBy(Transaction, { id });
+
+      if (!transaction) {
+        throw new NotFoundException(`La transacción con el id ${id} no fue encontrada.`);
+      }
+
+      
+      const previousContents = await manager.find(TransactionContents, {
+        where: { transaction: { id } },
+        relations: { product: true }
+      });
+
+      for (const content of previousContents) {
+        await manager.increment(Product, { id: content.product.id }, 'inventory', content.quantity);
+      }
+
+     
+      await manager.delete(TransactionContents, { transaction: { id } });
+
+      
+      transaction.total = contents.reduce((total, item) => total + (item.quantity * item.price), 0);
+      await manager.save(transaction);
+
+      
+      for (const content of contents) {
+        const product = await manager.findOneBy(Product, { id: content.productId });
+
+        if (!product) {
+          throw new NotFoundException([`El producto con el ID ${content.productId} no existe.`]);
+        }
+
+        if (content.quantity > product.inventory) {
+          throw new BadRequestException([`El articulo ${product.name} no tiene suficiente inventario.`]);
+        }
+
+        product.inventory -= content.quantity;
+
+        const transactionContent = new TransactionContents();
+        transactionContent.price = content.price;
+        transactionContent.product = product;
+        transactionContent.quantity = content.quantity;
+        transactionContent.transaction = transaction;
+
+        await manager.save(transactionContent);
+      }
+
+      return 'Venta Actualizada Correctamente';
+    });
   }
 
   remove(id: number) {
