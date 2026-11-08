@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put } from '@nestjs/common';
 import { IdValidationPipe } from '../common/pipes/id-validation/id-validation.pipe.js';
 import { CouponsService } from './coupons.service.js';
 import { CreateCouponDto } from './dto/create-coupon.dto.js';
@@ -35,7 +35,8 @@ export class CouponsController {
   }
 
   @Post('/apply-coupon')
+  @HttpCode(HttpStatus.OK)
   applyCoupon(@Body() applyCouponDto: ApplyCouponDto){
-    console.log(applyCouponDto)
+    return this.couponsService.applyCoupon(applyCouponDto.coupon_name)
   }
 }
