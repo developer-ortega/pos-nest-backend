@@ -3,6 +3,7 @@ import { IdValidationPipe } from '../common/pipes/id-validation/id-validation.pi
 import { CouponsService } from './coupons.service.js';
 import { CreateCouponDto } from './dto/create-coupon.dto.js';
 import { UpdateCouponDto } from './dto/update-coupon.dto.js';
+import { ApplyCouponDto } from './dto/apply-coupon.dto.js';
 
 @Controller('coupons')
 export class CouponsController {
@@ -31,5 +32,10 @@ export class CouponsController {
   @Delete(':id')
   remove(@Param('id', IdValidationPipe) id: string) {
     return this.couponsService.remove(+id);
+  }
+
+  @Post('/apply-coupon')
+  applyCoupon(@Body() applyCouponDto: ApplyCouponDto){
+    console.log(applyCouponDto)
   }
 }
