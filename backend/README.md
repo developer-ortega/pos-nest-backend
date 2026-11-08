@@ -1,6 +1,6 @@
-# POS Nest — Sistema de punto de venta
+# POS Nest Backend — API del sistema de punto de venta
 
-API REST de un sistema de punto de venta (POS) construida con **NestJS** y **TypeScript**, con base de datos **PostgreSQL** (TypeORM) y carga de imágenes a **Cloudinary**. El frontend se desarrollará con **Next.js** en un repositorio aparte.
+API REST de un sistema de punto de venta (POS) construida con **NestJS** y **TypeScript**, con base de datos **PostgreSQL** (TypeORM) y carga de imágenes a **Cloudinary**. El frontend (**Next.js**) vive en el repositorio [pos-nest-frontend](https://github.com/developer-ortega/pos-nest-frontend).
 
 > Proyecto de práctica **en desarrollo**. Este README se actualiza a medida que avanza.
 
@@ -11,7 +11,7 @@ API REST de un sistema de punto de venta (POS) construida con **NestJS** y **Typ
 | Backend | NestJS 12, TypeScript |
 | Base de datos | PostgreSQL con TypeORM |
 | Imágenes | Cloudinary |
-| Frontend | Next.js (repositorio aparte) |
+| Frontend | Next.js ([pos-nest-frontend](https://github.com/developer-ortega/pos-nest-frontend)) |
 | Pruebas y calidad | Vitest, Oxlint, Prettier |
 
 ## Requisitos
@@ -24,8 +24,8 @@ API REST de un sistema de punto de venta (POS) construida con **NestJS** y **Typ
 
 1. Clonar e instalar:
    ```bash
-   git clone https://github.com/developer-ortega/pos-nest.git
-   cd pos-nest
+   git clone https://github.com/developer-ortega/pos-nest-backend.git
+   cd pos-nest-backend
    npm install
    ```
    Si npm falla con `Cannot read properties of null (reading 'edgesOut')`, usar `npm install --legacy-peer-deps`.
